@@ -8,48 +8,15 @@
 
 namespace cvm {
 
+// treap mit Keys K und Prio P, default Prio ist double
 template<class K, class P = double>
 class Treap
 {
 public:
+    // initial empty treap constructor
     constexpr Treap() noexcept
         : root_(nullptr)
     {
-    }
-
-    constexpr Treap(const Treap& other) noexcept
-        : root_(nullptr)
-    {
-        root_ = copy(other.root_);
-    }
-
-    constexpr auto operator=(const Treap& other) noexcept -> Treap&
-    {
-        // clang-format off
-        if(&other == this) return *this;
-        // clang-format on
-
-        destroy(root_);
-        root_ = copy(other.root_);
-        return *this;
-    }
-
-    constexpr Treap(Treap&& other) noexcept
-        : root_(other.root_)
-    {
-        other.root_ = nullptr;
-    }
-
-    auto operator=(Treap&& other) noexcept -> Treap&
-    {
-        // clang-format off
-        if(&other == this) return *this;
-        // clang-format on
-
-        destroy(root_);
-        root_ = other.root_;
-        other.root_ = nullptr;
-        return *this;
     }
 
     ~Treap() noexcept
@@ -93,6 +60,7 @@ public:
         root_ = insert_recursive(insert_recursive, root_, std::move(elem), prio);
     }
 
+    // checks if an element with key K is in the treap
     [[nodiscard]] auto contains(const K& elem) const noexcept -> bool
     {
         // This is a helper lambda to perform the recursive search
@@ -116,6 +84,7 @@ public:
         return contains_recursive(contains_recursive, root_, elem);
     }
 
+    // lösche das element mit Key K aus dem treap
     auto delete_elem(const K& elem) noexcept
     {
         // This is a helper lambda to perform the recursive deletion
@@ -172,6 +141,8 @@ public:
         root_ = delete_recursive(delete_recursive, root_, elem);
     }
 
+    // pop wird implementiert, indem der root entfernt wird und dann der linke und rechte teilbaum
+    // des root knotens zusammengeführt werden mit join()
     constexpr auto pop() noexcept -> std::optional<std::pair<K, P>>
     {
         // Check if root is empty
