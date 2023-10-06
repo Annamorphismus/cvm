@@ -3,6 +3,8 @@ import argparse
 import os
 
 
+
+# Liest Daten von einer Datei des "naiven" Algorithmus.
 def read_naive_data_from_file(file_path):
     parsed_data = {}
 
@@ -10,19 +12,21 @@ def read_naive_data_from_file(file_path):
         lines = f.readlines()
 
         for line in lines:
+            # Überspringt leere Zeilen.
             if not line.strip():
                 continue
             parts = line.split()
             x, epsilon, delta = map(int, parts[0].split("/"))
             runtime = float(parts[1]) / 1000000
 
+            # Berücksichtigt nur Datenpunkte mit spezifischen Werten für epsilon und delta.
             if epsilon != 5:
                 continue
 
             if delta != 100:
                 continue
 
-            # Store data
+            # Speichert die Daten.
             key = (epsilon / 10, delta * 0.0001)
 
             if key not in parsed_data:
@@ -32,19 +36,21 @@ def read_naive_data_from_file(file_path):
     return parsed_data
 
 
+# Liest Daten von einer Datei des Knuth Algorithmus.
 def read_knuth_data_from_file(file_path):
     parsed_data = {}
     with open(file_path, "r") as f:
         lines = f.readlines()
 
         for line in lines:
+            # Überspringt leere Zeilen.
             if not line.strip():
                 continue
             parts = line.split()
             x, s = map(int, parts[0].split("/"))
             runtime = float(parts[1]) / 1000000
 
-            # Store data
+            # Speichert die Daten.
             key = s
             if key not in parsed_data:
                 parsed_data[key] = []
@@ -53,6 +59,7 @@ def read_knuth_data_from_file(file_path):
     return parsed_data
 
 
+# Liest alle Daten für eine gegebene Bitgröße.
 def read_all_data(bits):
     all_files = [f for f in os.listdir(".")]
     knuth = [
@@ -69,16 +76,21 @@ def read_all_data(bits):
     data = {}
     for f in knuth:
         d = read_knuth_data_from_file(f)
+
+        # Vereint die Daten.
         data = d | data
 
     for f in naive:
         d = read_naive_data_from_file(f)
         print(d)
+
+        # Vereint die Daten.
         data = d | data
 
     return data
 
 
+# Zeichnet alle Datenpunkte.
 def plot_all(data):
     # Plot
     plt.figure(figsize=(14, 8))
@@ -109,6 +121,7 @@ def plot_all(data):
     plt.show()
 
 
+# Hauptfunktionsaufruf, wenn das Skript direkt ausgeführt wird.
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot function from data file.")
     parser.add_argument("bits", help="Path to the data file.")
